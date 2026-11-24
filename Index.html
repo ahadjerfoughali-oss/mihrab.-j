@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محراب الحفظ والمراجعة</title>
+<style>
+  body { font-family: sans-serif; background: #f4f7f5; margin: 0; padding-bottom: 75px; color: #1f2d27; }
+  header { background: #14532d; color: #fff; padding: 14px; text-align: center; border-bottom: 4px solid #c59b27; }
+  .tabs { display: flex; position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 2px solid #ccc; z-index: 10; }
+  .tabs a { flex: 1; padding: 12px 2px; text-align: center; text-decoration: none; color: #14532d; font-weight: bold; font-size: 12px; border-left: 1px solid #eee; }
+  .box { padding: 12px; max-width: 620px; margin: auto; }
+  .page { display: none; }
+  .page:target { display: block; }
+  body:not(:has(:target)) #p1 { display: block; }
+  .card { background: #fff; padding: 14px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  h3 { color: #14532d; margin: 0 0 10px; border-right: 4px solid #c59b27; padding-right: 8px; font-size: 16px; }
+  select, textarea, button, input { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+  textarea { font-size: 18px; line-height: 1.8; border: 2px solid #14532d; }
+  button { background: #14532d; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+  .gold { background: #c59b27; color: #fff; }
+  .msg { padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 8px; display: none; text-align: center; line-height: 1.7; }
+  .err { background: #fee2e2; color: #991b1b; }
+  .ok { background: #dcfce7; color: #166534; }
+  .pt { background: #f0fdf4; border-right: 4px solid #16a34a; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 14px; line-height: 1.9; }
+  .qbox { background: #fefce8; border-right: 4px solid #c59b27; padding: 14px; border-radius: 8px; font-weight: bold; color: #14532d; text-align: center; margin-bottom: 10px; line-height: 1.8; }
+  .ref-box { margin-top: 8px; font-size: 15px; font-weight: normal; color: #1f2d27; background: rgba(255,255,255,0.92); padding: 8px; border-radius: 6px; text-align: right; line-height: 2; }
+  .ref-box b { color: #991b1b; }
+</style>
+</head>
+<body>
+
+<header>
+  <h2 style="margin:0; font-size:18px;">📖 محراب الحفظ والمراجعة</h2>
+  <small style="color:#fef08a;">حفص عن عاصم — مصحف المدينة النبوية ✨</small>
+</header>
+
+<div class="box">
+  <div id="p1" class="page">
+    <div class="card">
+      <h3>🕌 فحص السورة والآية (114 سورة — حفص عن عاصم)</h3>
+      <label style="display:block; font-size:13px; font-weight:bold; margin-bottom:4px; color:#14532d;">اختاري السورة أو ابحثي في كل القرآن:</label>
+      <select id="sSel" onchange="updateStatus()">
+        <option value="all" selected>كل القرآن الكريم (تحديد السورة تلقائياً)</option>
+      </select>
+      <div id="stInfo" style="font-size:13px; color:#14532d; font-weight:bold; margin-bottom:8px;">⏳ جارٍ تحميل نص المصحف...</div>
+      <textarea id="txt" rows="5" placeholder=""></textarea>
+      <div id="resErr" class="msg err"></div>
+      <div id="resOk" class="msg ok"></div>
+      <button onclick="checkAyah()">✅ فحص السورة والآية الآن</button>
+      <button class="gold" onclick="resetAll()">🔄 مسح وإعادة المحاولة</button>
+      <button id="dlBtn" style="display:none" onclick="saveOffline()">💾 تنزيل نسخة تعمل بدون إنترنت</button>
+    </div>
+  </div>
+
+  <div id="p2" class="page">
+    <div class="card">
+      <h3>🌟 أهمية القرآن الكريم في حياتنا</h3>
+      <div class="pt"><b>1. مصدر الهداية والبصيرة:</b><br>القرآن كتاب الله المنزَّل هدىً للناس، يبيّن الطريق ويفرّق بين الحق والباطل، ويضيء للمسلمة قراراتها. قال تعالى: «إن هذا القرآن يهدي للتي هي أقوم» (الإسراء: 9).</div>
+      <div class="pt"><b>2. البركة في الوقت والعلم:</b><br>من جعلت للقرآن وِرداً ثابتاً كل يوم رأت أثر ذلك في تنظيم وقتها وتيسير أمورها. وقد قال النبي ﷺ: «خيركم من تعلّم القرآن وعلّمه» (رواه البخاري).</div>
+      <div class="pt"><b>3. صفاء القلب وطمأنينته:</b><br>القرآن من أعظم الذكر، وفيه سكينة للقلب مع الأيام. قال تعالى: «ألا بذكر الله تطمئن القلوب» (الرعد: 28).</div>
+    </div>
+  </div>
+
+  <div id="p3" class="page">
+    <div class="card">
+      <h3>💎 ثمار حفظ القرآن على النفس</h3>
+      <div class="pt"><b>1. انشراح الصدر وزوال الهم:</b><br>الأنس بآيات الله يهدّئ النفس ويخفف ثقل الهموم، وقد وصف الله القرآن بأنه «شفاء لما في الصدور» (يونس: 57).</div>
+      <div class="pt"><b>2. تقوية الذاكرة والتركيز:</b><br>المداومة على الحفظ والمراجعة تدرّب الذاكرة وتعوّد العقل على الانتباه، ويلاحظ كثير من الحافظات أن ذلك ينعكس على دراستهن.</div>
+      <div class="pt"><b>3. الثبات والاتزان النفسي:</b><br>تجد الحافظة في آياتها زاداً ترجع إليه عند الشدة، ويمنحها الارتباط اليومي بالقرآن استقراراً. وقد قال النبي ﷺ: «الماهر بالقرآن مع السفرة الكرام البررة» (متفق عليه).</div>
+    </div>
+  </div>
+
+  <div id="p4" class="page">
+    <div class="card">
+      <h3>✨ جرعة تحفيز لحاملة القرآن</h3>
+      <div id="qText" class="qbox"></div>
+      <button onclick="nextQuote()">🔄 عبارة تحفيزية أخرى</button>
+    </div>
+    <div class="card">
+      <h3>💖 أضيفي عبارتكِ الخاصة</h3>
+      <input id="newQ" placeholder="">
+      <button class="gold" onclick="addQuote()">حفظ العبارة</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <a href="#p1">📖 فحص الآية</a>
+  <a href="#p2">🌟 أهمية القرآن</a>
+  <a href="#p3">💎 ثمار الحفظ</a>
+  <a href="#p4">✨ التحفيز</a>
+</div>
+
+<script>
+const API = 'https://api.alquran.cloud/v1/quran/quran-simple-clean';
+const BSM = 'بسم الله الرحمن الرحيم';
+const BQ = BSM.replace(/ /g, '');
+const $ = id => document.getElementById(id);
+let S = [];
+const NAMES = 'الفاتحة،البقرة،آل عمران،النساء،المائدة،الأنعام،الأعراف،الأنفال،التوبة،يونس،هود،يوسف،الرعد،إبراهيم،الحجر،النحل،الإسراء،الكهف،مريم،طه،الأنبياء،الحج،المؤمنون،النور،الفرقان،الشعراء،النمل،القصص،العنكبوت،الروم،لقمان،السجدة،الأحزاب،سبأ،فاطر،يس،الصافات،ص،الزمر،غافر،فصلت،الشورى،الزخرف،الدخان،الجاثية،الأحقاف،محمد،الفتح،الحجرات،ق،الذاريات،الطور،النجم،القمر،الرحمن،الواقعة،الحديد،المجادلة،الحشر،الممتحنة،الصف،الجمعة،المنافقون،التغابن،الطلاق،التحريم،الملك،القلم،الحاقة،المعارج،نوح،الجن،المزمل،المدثر،القيامة،الإنسان،المرسلات،النبأ،النازعات،عبس،التكوير،الانفطار،المطففين،الانشقاق،البروج،الطارق،الأعلى،الغاشية،الفجر،البلد،الشمس،الليل،الضحى،الشرح،التين،العلق،القدر،البينة،الزلزلة،العاديات،القارعة،التكاثر،العصر،الهمزة،الفيل،قريش،الماعون،الكوثر،الكافرون،النصر،المسد،الإخلاص،الفلق،الناس'.split('،');
+$('sSel').length = 1;
+NAMES.forEach((nm, i) => {
+  const o = document.createElement('option');
+  o.value = i + 1; o.textContent = (i + 1) + '. ' + nm;
+  $('sSel').appendChild(o);
+});
+
+function norm(s) {
+  return s.replace(/ی/g, 'ي').replace(/ک/g, 'ك')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '')
+    .replace(/ٱ/g, 'ا').replace(/ى/g, 'ي')
+    .replace(/[^\u0621-\u064A\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function raw(s) {
+  return s.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '').replace(/ٱ/g, 'ا');
+}
+
+function build(surahs) {
+  S = surahs.map(s => {
+    const w = [], r = [], ay = [];
+    s.ayahs.forEach(a => {
+      let ws = a.text.split(/\s+/).map(x => ({ n: norm(x).replace(/\s/g, ''), r: raw(x) })).filter(x => x.n);
+      if (s.number !== 1 && a.numberInSurah === 1 && ws.slice(0, 4).map(x => x.n).join(' ') === BSM) ws = ws.slice(4);
+      ws.forEach(x => { w.push(x.n); r.push(x.r); ay.push(a.numberInSurah); });
+    });
+    return { n: s.number, name: s.name.replace(/^سورة\s*/, ''), w, r, ay };
+  });
+}
+
+const U = new Map();
+function buildU(s) {
+  let u = '', st = [];
+  s.w.forEach(x => { st.push(u.length); u += x; });
+  U.set(s, { u, st });
+}
+function wordAt(st, p) {
+  let lo = 0, hi = st.length - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (st[m] <= p) lo = m; else hi = m - 1; }
+  return lo;
+}
+function findU(list, q, max) {
+  const out = [];
+  for (const s of list) {
+    const { u, st } = U.get(s);
+    let f = 0, p;
+    while ((p = u.indexOf(q, f)) >= 0) {
+      f = p + 1;
+      const i = wordAt(st, p), j = wordAt(st, p + q.length - 1);
+      if (st[i] !== p || st[j] + s.w[j].length !== p + q.length) continue;
+      out.push({ s, i, j });
+      if (out.length >= max) return out;
+    }
+  }
+  return out;
+}
+function findPre(list, pre) {
+  for (const s of list) {
+    const { u, st } = U.get(s);
+    let f = 0, p;
+    while ((p = u.indexOf(pre, f)) >= 0) {
+      f = p + 1;
+      const i = wordAt(st, p);
+      if (st[i] === p) return { s, p, i };
+    }
+  }
+  return null;
+}
+
+// حدود الآية: بداية الآية ونهايتها (بفهرس الكلمات)
+function vStart(s, i) { while (i > 0 && s.ay[i - 1] === s.ay[i]) i--; return i; }
+function vEnd(s, j) { while (j < s.w.length - 1 && s.ay[j + 1] === s.ay[j]) j++; return j; }
+
+// الكلمات الناقصة من أول الآية ومن آخرها بالنسبة لما كُتب (a..b)
+function gaps(s, a, b) {
+  const x0 = vStart(s, a), x1 = vEnd(s, b);
+  const bold = new Set(), head = [], tail = [];
+  for (let k = x0; k < a; k++) { bold.add(k); head.push(s.r[k]); }
+  for (let k = b + 1; k <= x1; k++) { bold.add(k); tail.push(s.r[k]); }
+  return { bold, head, tail };
+}
+
+// عرض الآية (أو الآيات) كاملة كما في المصحف مع تمييز الكلمات
+function versesHtml(s, a, b, bold) {
+  const x0 = vStart(s, a), x1 = vEnd(s, b);
+  const parts = [];
+  let cur = s.ay[x0], buf = [];
+  for (let k = x0; k <= x1; k++) {
+    if (s.ay[k] !== cur) { parts.push('الآية ' + cur + ': «' + buf.join(' ') + '»'); cur = s.ay[k]; buf = []; }
+    buf.push(bold.has(k) ? '<b>' + s.r[k] + '</b>' : s.r[k]);
+  }
+  parts.push('الآية ' + cur + ': «' + buf.join(' ') + '»');
+  return '📖 كما في مصحف المدينة:<br>' + parts.join('<br>');
+}
+
+// أقرب مواضع في المصحف لما كتبتِه (بحث تقريبي على مستوى الحروف)
+function fuzzy(list, q) {
+  const m = q.length;
+  let bestD = 1e9, ends = [];
+  for (const s of list) {
+    const u = U.get(s).u, n = u.length;
+    let prev = new Int16Array(m + 1), cur = new Int16Array(m + 1);
+    for (let i = 0; i <= m; i++) prev[i] = i;
+    for (let j = 0; j < n; j++) {
+      const c = u.charCodeAt(j);
+      cur[0] = 0;
+      for (let i = 1; i <= m; i++) {
+        let v = prev[i - 1] + (q.charCodeAt(i - 1) === c ? 0 : 1);
+        const a = prev[i] + 1; if (a < v) v = a;
+        const b = cur[i - 1] + 1; if (b < v) v = b;
+        cur[i] = v;
+      }
+      const d = cur[m];
+      if (d < bestD) { bestD = d; ends = [{ s, end: j }]; }
+      else if (d === bestD && ends.length < 400) ends.push({ s, end: j });
+      const t = prev; prev = cur; cur = t;
+    }
+  }
+  if (!ends.length) return null;
+  const seen = new Set(), cands = [];
+  for (const e of ends) {
+    const wi = wordAt(U.get(e.s).st, e.end);
+    const key = e.s.n + ':' + e.s.ay[wi];
+    if (!seen.has(key)) { seen.add(key); cands.push({ s: e.s, end: e.end }); }
+  }
+  return { d: bestD, cands };
+}
+
+// مقابلة كلمات ما كتبتِه بكلمات المصحف
+function align(uw, W) {
+  const n = uw.length, k = W.length;
+  const D = [], B = [];
+  for (let i = 0; i <= n; i++) { D.push(new Array(k + 1).fill(0)); B.push(new Array(k + 1).fill(0)); }
+  for (let i = 1; i <= n; i++) { D[i][0] = i; B[i][0] = 2; }
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= k; j++) {
+      let v = D[i - 1][j - 1] + (uw[i - 1] === W[j - 1] ? 0 : 1), bk = 0;
+      if (D[i - 1][j] + 1 < v) { v = D[i - 1][j] + 1; bk = 2; }
+      if (D[i][j - 1] + 1 < v) { v = D[i][j - 1] + 1; bk = 1; }
+      D[i][j] = v; B[i][j] = bk;
+    }
+  }
+  let j = 0;
+  for (let t = 1; t <= k; t++) if (D[n][t] < D[n][j]) j = t;
+  let i = n; const ops = [];
+  while (i > 0) {
+    const bk = (j === 0) ? 2 : B[i][j];
+    if (bk === 0) { ops.push({ t: uw[i - 1] === W[j - 1] ? 'ok' : 'sub', u: uw[i - 1], wi: j - 1 }); i--; j--; }
+    else if (bk === 2) { ops.push({ t: 'extra', u: uw[i - 1] }); i--; }
+    else { ops.push({ t: 'miss', wi: j - 1 }); j--; }
+  }
+  return ops.reverse();
+}
+
+function fdiag(list, q, uw) {
+  const f = fuzzy(list, q);
+  if (!f || f.d > Math.max(3, Math.floor(q.length * 0.3))) return null;
+  const b = f.cands[0];
+  const s = b.s, st = U.get(s).st;
+  const e = wordAt(st, b.end);
+  const i0 = wordAt(st, Math.max(0, b.end - q.length - f.d - 6));
+  const W = s.w.slice(i0, e + 1);
+  const ops = align(uw, W);
+  const used = ops.filter(o => o.wi !== undefined);
+  if (!used.length) return null;
+  const errs = ops.filter(o => o.t !== 'ok');
+  const a0 = i0 + Math.min(...used.map(o => o.wi)), b0 = i0 + Math.max(...used.map(o => o.wi));
+  const g = gaps(s, a0, b0);
+  if (!errs.length && !g.head.length && !g.tail.length) return null;
+  const a = s.ay[a0], z = s.ay[b0];
+  let msg = '❌ في النص اختلاف عن المصحف<div class="ref-box">📍 سورة ' + NAMES[s.n - 1] + ' — ' + (a === z ? 'الآية ' + a : 'الآيات ' + a + ' إلى ' + z);
+  errs.forEach(o => {
+    if (o.t === 'sub') msg += '<br>❌ كتبتِ: «' + o.u + '» والصحيح في المصحف: «' + s.r[i0 + o.wi] + '»';
+    else if (o.t === 'extra') msg += '<br>❌ كلمة زائدة في ما كتبتِ: «' + o.u + '»';
+    else msg += '<br>❌ كلمة ناقصة، والصحيح أن تأتي: «' + s.r[i0 + o.wi] + '»';
+  });
+  if (g.head.length) msg += '<br>❌ ناقص من بداية الآية: «' + g.head.join(' ') + '»';
+  if (g.tail.length) msg += '<br>❌ ناقص من آخر الآية: «' + g.tail.join(' ') + '»';
+  if (errs.length < ops.length) msg += '<br>✅ باقي الكلمات مطابقة للمصحف';
+  const bad = new Set(g.bold);
+  errs.filter(o => o.wi !== undefined).forEach(o => bad.add(i0 + o.wi));
+  msg += '<br>' + versesHtml(s, a0, b0, bad) + '</div>';
+  const others = f.cands.slice(1, 4).map(c => {
+    const w2 = wordAt(U.get(c.s).st, c.end);
+    return 'سورة ' + NAMES[c.s.n - 1] + ' — الآية ' + c.s.ay[w2];
+  });
+  if (others.length) msg += '<div class="ref-box">قد تقصدين أيضاً: ' + others.join('، ') + '</div>';
+  return msg;
+}
+
+function prep() {
+  S.forEach(s => { s.t = ' ' + s.w.join(' ') + ' '; });
+  S.forEach(buildU);
+  if (!EMBED) $('dlBtn').style.display = 'block';
+  const sel = $('sSel');
+  if (sel.options.length < 2) {
+    S.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.n; o.textContent = s.n + '. ' + NAMES[s.n - 1];
+      sel.appendChild(o);
+    });
+  }
+  updateStatus();
+}
+
+const EMBED = null;
+async function load() {
+  if (EMBED) { S = EMBED; prep(); return; }
+  try {
+    const c = localStorage.getItem('qcache2');
+    if (c) { S = JSON.parse(c); prep(); return; }
+  } catch (e) {}
+  try {
+    const d = await (await fetch(API)).json();
+    build(d.data.surahs);
+    try { localStorage.setItem('qcache2', JSON.stringify(S)); } catch (e) {}
+    prep();
+  } catch (e) {
+    $('stInfo').textContent = '⚠️ تعذّر تحميل نص المصحف. تأكدي من الاتصال بالإنترنت ثم أعيدي فتح الصفحة.';
+  }
+}
+
+function updateStatus() {
+  $('stInfo').textContent = '✅ اكتبي الآية كاملة بأي خط عربي — الفحص بالحرف على نص مصحف المدينة (حفص عن عاصم) مع تجاهل التشكيل والخط والفراغات.';
+}
+
+function show(el, html) { el.innerHTML = html; el.style.display = 'block'; }
+
+function where(h) {
+  const a = h.s.ay[h.i], b = h.s.ay[h.j];
+  return 'سورة ' + NAMES[h.s.n - 1] + ' — ' + (a === b ? 'الآية ' + a : 'الآيات ' + a + ' إلى ' + b);
+}
+
+function leadM(s, i, a) {
+  let m = 0, len = 0;
+  while (i - m > 0 && len < a) { m++; len += s.w[i - m].length; }
+  return m;
+}
+
+// احتياطي: يبحث عن أطول بداية مطابقة
+function diag(list, q) {
+  for (let a = 0; a <= 12 && a < q.length - 5; a++) {
+    const t = q.slice(a);
+    for (let k = t.length; k >= 5; k--) {
+      const h = findPre(list, t.slice(0, k));
+      if (!h) continue;
+      const s = h.s, st = U.get(s).st;
+      const j = wordAt(st, h.p + k - 1);
+      const atEnd = h.p + k === st[j] + s.w[j].length;
+      const full = (k === t.length && atEnd);
+      const wi = atEnd ? j + 1 : j;
+      const m = a > 0 ? leadM(s, h.i, a) : 0;
+      const good = s.r.slice(h.i, wi).join(' ');
+      const endIdx = full ? j : Math.max(h.i, Math.min(wi, s.w.length - 1));
+      let msg = '❌ في النص اختلاف عن المصحف<div class="ref-box">📍 ' + where({ s, i: h.i - m, j: endIdx });
+      if (a > 0) {
+        msg += '<br>❌ كتبتِ في البداية: «' + q.slice(0, a) + '» والصحيح في المصحف: «' +
+          (m ? s.r.slice(h.i - m, h.i).join(' ') + '» (الآية ' + s.ay[h.i - m] + ')' : '—»');
+      }
+      if (full) {
+        msg += '<br>✅ باقي ما كتبتِ مطابق للمصحف: «' + good + '»';
+      } else {
+        if (good) msg += '<br>✅ الصحيح حتى هنا: «' + good + '»';
+        if (wi >= s.w.length) {
+          msg += '<br>انتهت السورة وكتبتِ زيادة: «' + t.slice(st[s.w.length - 1] + s.w[s.w.length - 1].length - h.p) + '»';
+        } else {
+          const off = st[wi] - h.p;
+          const cw = s.w[wi];
+          let L = cw.length;
+          if (wi + 1 < s.w.length) {
+            const nx = s.w[wi + 1];
+            for (const d of [0, -1, 1, -2, 2]) {
+              const l = cw.length + d;
+              if (l > 0 && t.slice(off + l, off + l + nx.length) === nx) { L = l; break; }
+            }
+          }
+          msg += '<br>❌ كتبتِ: «' + t.slice(off, off + L) + '» والصحيح في المصحف: «' + s.r[wi] + '»';
+          const an = s.ay[wi];
+          const ayTxt = s.r.map((x, i) => s.ay[i] === an ? (i === wi ? '<b>' + x + '</b>' : x) : null).filter(Boolean).join(' ');
+          msg += '<br>📖 الآية ' + an + ' كما في مصحف المدينة: «' + ayTxt + '»';
+        }
+      }
+      return msg + '</div>';
+    }
+  }
+  return null;
+}
+
+function bmsg(n) {
+  return n === 9
+    ? '⚠️ بدأتِ بالبسملة، وسورة التوبة ليس في أولها بسملة في المصحف.'
+    : 'ℹ️ البسملة تُكتب في أول السورة في المصحف لكنها ليست آية منها (إلا في الفاتحة).';
+}
+
+function checkAyah() {
+  const ok = $('resOk'), er = $('resErr');
+  ok.style.display = er.style.display = 'none';
+  if (!S.length) { show(er, '⚠️ نص المصحف غير محمَّل بعد. انتظري قليلاً أو تأكدي من الاتصال بالإنترنت.'); return; }
+  let q0 = norm($('txt').value).replace(/\s/g, '');
+  if (q0.length < 4) { show(er, 'اكتبي جزءاً أطول من الآية.'); return; }
+  const v = $('sSel').value;
+  const list = v === 'all' ? S : [S[+v - 1]];
+
+  let bsm = false;
+  if (q0.startsWith(BQ) && q0.length - BQ.length >= 4 && !findU(S, q0, 1).length) {
+    q0 = q0.slice(BQ.length); bsm = true;
+  }
+  let uw = norm($('txt').value).split(' ');
+  if (bsm) uw = uw.slice(4);
+  const bpre = n => bsm ? '<div class="ref-box">' + bmsg(n) + '</div>' : '';
+
+  const q2 = q0.replace(/^[أإآ]ل(?=[مر])/, 'ال');
+  let q = q0, note = '';
+
+  let hits = findU(list, q, 8);
+  if (!hits.length && q2 !== q0) {
+    const h2 = findU(list, q2, 8);
+    if (h2.length) {
+      hits = h2; q = q2;
+      note = '<div class="ref-box">ℹ️ كتبتِ «' + q0.slice(0, 3) + '» والمرسوم في المصحف «' + q2.slice(0, 3) + '» — قبلتُها.</div>';
+    }
+  }
+  if (hits.length) {
+    const full = hits.filter(h => { const g = gaps(h.s, h.i, h.j); return !g.head.length && !g.tail.length; });
+    if (full.length) {
+      const t9 = bsm && full[0].s.n === 9;
+      show(t9 ? er : ok, (t9 ? '⚠️ باقي النص مطابق للمصحف' : '✅ النص مطابق لمصحف المدينة بالحرف') +
+        full.map(h => '<div class="ref-box">📍 ' + where(h) + '</div>').join('') + note + bpre(full[0].s.n));
+      return;
+    }
+    const h = hits[0], g = gaps(h.s, h.i, h.j);
+    let msg = '⚠️ ما كتبتِه صحيح لكنه ناقص<div class="ref-box">📍 ' + where(h);
+    if (g.head.length) msg += '<br>❌ ناقص من بداية الآية: «' + g.head.join(' ') + '»';
+    if (g.tail.length) msg += '<br>❌ ناقص من آخر الآية: «' + g.tail.join(' ') + '»';
+    msg += '<br>' + versesHtml(h.s, h.i, h.j, g.bold) + '</div>';
+    if (hits.length > 1) msg += '<div class="ref-box">ويوجد ما كتبتِه أيضاً في: ' + hits.slice(1, 4).map(where).join('، ') + '</div>';
+    show(er, msg + note + bpre(h.s.n));
+    return;
+  }
+
+  if (v !== 'all') {
+    let other = findU(S, q0, 8);
+    if (!other.length && q2 !== q0) other = findU(S, q2, 8);
+    if (other.length) {
+      let m2 = '⚠️ النص صحيح، لكنه ليس من سورة ' + NAMES[+v - 1] + '. موضعه في المصحف:' +
+        other.map(h => '<div class="ref-box">📍 ' + where(h) + '</div>').join('');
+      const g2 = gaps(other[0].s, other[0].i, other[0].j);
+      if (g2.head.length || g2.tail.length) {
+        m2 += '<div class="ref-box">ثم هو ناقص أيضاً:' +
+          (g2.head.length ? '<br>❌ ناقص من بداية الآية: «' + g2.head.join(' ') + '»' : '') +
+          (g2.tail.length ? '<br>❌ ناقص من آخر الآية: «' + g2.tail.join(' ') + '»' : '') +
+          '<br>' + versesHtml(other[0].s, other[0].i, other[0].j, g2.bold) + '</div>';
+      }
+      show(er, m2 + bpre(+v));
+      return;
+    }
+    const d = fdiag(list, q0, uw) || diag(list, q0);
+    if (d) { show(er, d + bpre(+v)); return; }
+    const d2 = fdiag(S, q0, uw) || diag(S, q0);
+    if (d2) { show(er, '⚠️ لم أجد هذا النص في سورة ' + NAMES[+v - 1] + '. أقرب موضع في المصحف:<br>' + d2 + bpre(+v)); return; }
+  } else {
+    const d = fdiag(S, q0, uw) || diag(S, q0);
+    if (d) { show(er, d + bpre(0)); return; }
+  }
+  show(er, '❌ لم أجد هذا النص في القرآن الكريم (مصحف المدينة، حفص عن عاصم). راجعي الكتابة وحاولي مرة أخرى.');
+}
+
+function saveOffline() {
+  const data = JSON.stringify(S, (k, v) => k === 't' ? undefined : v);
+  const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace('const EMBED = null;', () => 'const EMBED = ' + data + ';');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+  a.download = 'mihrab-offline.html';
+  a.click();
+}
+
+function resetAll() {
+  $('txt').value = '';
+  $('resOk').style.display = $('resErr').style.display = 'none';
+}
+
+const base = [
+  'خطوة صغيرة كل يوم أثبت من قفزة كبيرة ثم انقطاع.',
+  'المراجعة هي سرّ الثبات، فراجعي أكثر مما تحفظين.',
+  'الصبر على الحفظ اليوم يصير أنساً بالقرآن غداً.',
+  'وردٌ يومي ثابت خيرٌ من همّة تأتي وتذهب.',
+  'كلما ثقلت عليكِ الآيات تذكّري أنكِ في صحبة كتاب الله.'
+];
+let extra = [];
+try { extra = JSON.parse(localStorage.getItem('myQuotes') || '[]'); } catch (e) {}
+function nextQuote() {
+  const all = base.concat(extra);
+  $('qText').textContent = all[Math.floor(Math.random() * all.length)];
+}
+function addQuote() {
+  const t = $('newQ').value.trim();
+  if (!t) return;
+  extra.push(t);
+  try { localStorage.setItem('myQuotes', JSON.stringify(extra)); } catch (e) {}
+  $('newQ').value = '';
+  $('qText').textContent = t;
+}
+
+nextQuote();
+load();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+</script>
+</body>
+</html>
